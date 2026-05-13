@@ -109,7 +109,7 @@ func NewHTTPReverseProxy(option HTTPReverseProxyOptions, vhostRouter *Routers) *
 		// because the local service may close its end of the connection (e.g. after its own
 		// keep-alive timeout), causing the frp client to close the underlying work connection.
 		// If that closure races with the transport writing a new request on the same connection,
-		// the write error is not recognised as a retryable error and the request fails with a
+		// the write error is not recognized as a retryable error and the request fails with a
 		// 404. Disabling keep-alives ensures each HTTP request gets a fresh work connection
 		// from frp's own connection pool, eliminating the stale-connection race.
 		Transport: &http.Transport{
