@@ -104,10 +104,17 @@ func NewHTTPReverseProxy(option HTTPReverseProxyOptions, vhostRouter *Routers) *
 			return nil
 		},
 		// Create a connection to one proxy routed by route policy.
+		// DisableKeepAlives prevents the transport from reusing frp work connections across
+		// multiple HTTP requests. Reusing these connections can cause intermittent 404 errors
+		// because the local service may close its end of the connection (e.g. after its own
+		// keep-alive timeout), causing the frp client to close the underlying work connection.
+		// If that closure races with the transport writing a new request on the same connection,
+		// the write error is not recognised as a retryable error and the request fails with a
+		// 404. Disabling keep-alives ensures each HTTP request gets a fresh work connection
+		// from frp's own connection pool, eliminating the stale-connection race.
 		Transport: &http.Transport{
 			ResponseHeaderTimeout: rp.responseHeaderTimeout,
-			IdleConnTimeout:       60 * time.Second,
-			MaxIdleConnsPerHost:   5,
+			DisableKeepAlives:     true,
 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 				return rp.CreateConnection(ctx.Value(RouteInfoKey).(*RequestRouteInfo), true)
 			},
