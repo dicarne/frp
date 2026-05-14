@@ -1,7 +1,3 @@
-## Features
-
-* Support tokenSource for loading authentication tokens from files.
-
 ## Fixes
 
-* Fix SSH tunnel gateway incorrectly binding to proxyBindAddr instead of bindAddr, which caused external connections to fail when proxyBindAddr was set to 127.0.0.1.
+* Fixed a configuration-dependent authentication bypass in `type = "http"` proxies when `routeByHTTPUser` is used together with `httpUser` / `httpPassword`. This affected proxy-style requests. Proxy-style authentication failures now return `407 Proxy Authentication Required`.
